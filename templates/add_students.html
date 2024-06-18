@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Add Students{% endblock %}
+
+{% block content %}
+    <h2>Add Students</h2>
+    <form method="post">
+        <label for="emails">Emails (paste emails separated by spaces):</label><br>
+        <textarea id="emails" name="emails" rows="10" cols="50" required></textarea><br><br>
+        <input type="submit" value="Add Students">
+    </form>
+{% endblock %}

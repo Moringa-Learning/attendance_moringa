@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Email Attendance Checker{% endblock %}
+
+{% block content %}
+    <p id="welcome">Welcome To Email Attendance <span id="current_user">{{ current_user.username|upper }}</span></p>
+
+    <div class="container mt-5">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="col">
+          <div class="card">
+            <a class="nav-link" href="{{ url_for('add_students') }}">
+              <i class="fa-solid fa-user-plus"></i>
+              <div class="card-body">
+                <h5 class="card-title">Add Students</h5>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <a class="nav-link" href="{{ url_for('list_students') }}">
+              <i class="fa-solid fa-list"></i>
+              <div class="card-body">
+                <h5 class="card-title">List Students</h5>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <a class="nav-link" href="{{ url_for('check_attendance') }}">
+              <i class="fa-solid fa-school-circle-check"></i>
+              <div class="card-body">
+                <h5 class="card-title">Check Attendance</h5>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <a class="nav-link" href="{{ url_for('logout') }}">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <div class="card-body">
+                <h5 class="card-title">Log Out</h5>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+.nav a {
+    color: inherit ;
+}
+
+#welcome {
+    text-align: center;
+}
+
+#current_user{
+    color: orange;
+}
+
+.card {
+    text-align: center;
+    padding: 10px;
+    border: 0;
+}
+
+.card i {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.card:hover {
+    color: orange;
+}
+
+.buttonsEdit{
+    display: flex;
+}
+
+.buttonsEdit a{
+    margin: 5px 10px;
+}
+
+.buttonsEdit a:hover{
+    color: red;
+}
