@@ -1,3 +1,11 @@
+body {
+ background-color: whitesmoke;
+}
+
+header {
+    padding: 40px 5px;
+}
+
 .nav a {
     color: inherit ;
 }
@@ -5,6 +13,19 @@
 #welcome {
     text-align: center;
 }
+
+.nav-pills .nav-link.active{
+    background-color: whitesmoke !important;
+    color: orange !important;
+    text-decoration: underline 5px solid orange;
+
+}
+
+.nav-pills .nav-link:hover{
+    color: black !important;
+    text-decoration: underline 5px solid orange;
+}
+
 
 #current_user{
     color: orange;
@@ -14,6 +35,7 @@
     text-align: center;
     padding: 10px;
     border: 0;
+    background-color: whitesmoke;
 }
 
 .card i {
@@ -35,4 +57,18 @@
 
 .buttonsEdit a:hover{
     color: red;
+}
+
+input[type='text'], input[type='password'] {
+    width: 400px;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+input[type='text']:focus, input[type='password']:focus {
+    border: 1px solid orange;
+}
+
+footer{
+    text-align: center;
 }

@@ -9,7 +9,7 @@
     <label for="new_email">New Email:</label><br>
     <input type="email" id="new_email" name="new_email" value="{{ student.email }}" required><br><br>
     <div class="buttonsEdit">
-        <input type="submit" value="Update" style="width:100px">
+        <input type="submit" value="Update" style="width:100px" class="btn btn-warning">
         <a class="nav-link" href="{{ url_for('list_students') }}">Cancel</a>
     </div>
 
