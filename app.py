@@ -1,13 +1,19 @@
-from flask import Flask, request, render_template, redirect, url_for, flash
+from flask import Flask, request, render_template, redirect, url_for, flash, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
+import os
+import psycopg2
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+import datetime
 import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://maingi:goQIqtZ0ApVyYGoZFEh0VEV2vUeAsuRc@dpg-cosk1u20si5c73avk83g-a.oregon-postgres.render.com/home_db_rz3y'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -26,6 +32,66 @@ class Student(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+# Extras
+def fetch_emails_from_db():
+    try:
+        conn = psycopg2.connect(app.config.get('SQLALCHEMY_DATABASE_URI'))
+        cursor = conn.cursor()
+        cursor.execute("SELECT email FROM student")
+        emails = [row[0] for row in cursor.fetchall()]
+        cursor.close()
+        conn.close()
+        return emails
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        return []
+    
+def create_pdf_template(output_filename, num_days, emails):
+    if num_days < 1 or num_days > 6:
+        raise ValueError("Number of days must be between 1 and 6")
+
+    pdf = SimpleDocTemplate(output_filename, pagesize=A4)
+    elements = []
+
+    top_header = ['Email']
+    for i in range(num_days):
+        top_header.extend([f'Day {i + 1}', '']) 
+
+    second_header = ['']
+    for _ in range(num_days):
+        second_header.extend(['Time In', 'Sign'])
+
+    headers = [top_header, second_header]
+
+    data = headers
+    for email in emails:
+        row = [email] + ['' for _ in range(len(top_header) - 1)]
+        data.append(row)
+
+    table = Table(data)
+
+    style = TableStyle([
+        ('TEXTCOLOR', (0, 0), (-1, 1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 1), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (0, 2), (0, -1), 'LEFT'),
+    ])
+    
+    col_start = 1
+    for i in range(num_days):
+        col_end = col_start + 1
+        style.add('SPAN', (col_start, 0), (col_end, 0))
+        col_start += 2
+    
+    table.setStyle(style)
+
+    elements.append(table)
+
+    pdf.build(elements)
+
+# Routes
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -118,6 +184,47 @@ def delete_student(student_id):
     db.session.commit()
     flash('Student deleted successfully', 'success')
     return redirect(url_for('list_students'))
+
+@app.route('/attendance_preview', methods=['GET', 'POST'])
+@login_required
+def attendance_preview():
+    if request.method == 'POST':
+        num_days = int(request.form['num_days'])
+        emails = fetch_emails_from_db()
+        return render_template('attendance_preview.html', num_days=num_days, emails=emails)
+    return render_template('generate_pdf.html')
+
+@app.route('/generate_pdf', methods=['POST'])
+@login_required
+def generate_pdf():
+    num_days = int(request.form['num_days'])
+    emails = fetch_emails_from_db()
+    output_filename = f'attendance/attendance_template-{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.pdf'
+    create_pdf_template(output_filename, num_days, emails)
+    return send_file(output_filename, as_attachment=True)
+
+@app.route('/manage_files', methods=['GET'])
+@login_required
+def manage_files():
+    files = os.listdir('attendance')
+    files = [f for f in files if f.endswith('.pdf')]
+    return render_template('manage_files.html', files=files)
+
+@app.route('/view_file/<filename>', methods=['GET'])
+@login_required
+def view_file(filename):
+    return send_file(os.path.join('attendance', filename))
+
+@app.route('/delete_file/<filename>', methods=['POST'])
+@login_required
+def delete_file(filename):
+    file_path = os.path.join('attendance', filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        flash(f'{filename} has been deleted.', 'success')
+    else:
+        flash(f'{filename} does not exist.', 'danger')
+    return redirect(url_for('manage_files'))
 
 if __name__ == '__main__':
     with app.app_context():

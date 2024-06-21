@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance{% endblock %}
+
+{% block content %}
+
+<h1>Attendance Preview</h1>
+<table id="attendanceTable" class="table table-bordered display">
+    <thead>
+        <tr>
+            <th>Email</th>
+            {% for i in range(1, num_days + 1) %}
+                <th colspan="2">Day {{ i }}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th></th>
+            {% for i in range(num_days) %}
+                <th>Time In</th>
+                <th>Sign</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for email in emails %}
+        <tr>
+            <td>{{ email }}</td>
+            {% for i in range(num_days) %}
+                <td></td>
+                <td></td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('generate_pdf', num_days=num_days) }}" class="btn btn-success print-hidden">Download PDF</a>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function() {
+        $('#attendanceTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'print',
+                    customize: function (win) {
+                        $(win.document.body).css('font-size', '10px');
+                        $(win.document.body).find('table').css('font-size', '10px');
+                        $(win.document.body).find('table.dataTable td, table.dataTable th').css('padding', '2px');
+                    }
+                }
+            ]
+        });
+    });
+</script>
+{% endblock %}

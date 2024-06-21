@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student{% endblock %}
+
+{% block content %}
+
+<h1>Generate Attendance PDF</h1>
+<form method="POST" action="{{ url_for('attendance_preview') }}">
+    <div class="mb-3">
+        <label for="num_days" class="form-label">Number of Days</label>
+        <input type="number" class="form-control" id="num_days" name="num_days" min="1" max="6" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Preview Attendance List</button>
+</form>
+
+{% endblock %}
+

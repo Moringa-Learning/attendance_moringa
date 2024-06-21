@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Email Attendance Checker{% endblock %}
+
+{% block content %}
+
+<h1>Manage Attendance Files</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Filename</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for file in files %}
+        <tr>
+            <td>{{ file }}</td>
+            <td>
+                <a href="{{ url_for('view_file', filename=file) }}" class="btn btn-primary">View</a>
+                <form action="{{ url_for('delete_file', filename=file) }}" method="POST" style="display:inline-block;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+

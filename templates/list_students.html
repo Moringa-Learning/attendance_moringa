@@ -5,7 +5,7 @@
 {% block content %}
 <h2>List of Students</h2>
 <h5>Total {{noOfstudents}}</h5>
-<table class="table">
+<table id="attendanceTable" class="table table-bordered display">
     <thead>
         <tr>
             <th scope="col">ID</th>
@@ -26,5 +26,19 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    $(document).ready(function() {
+        $('#attendanceTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true
+        });
+    });
+</script>
 
 {% endblock %}
