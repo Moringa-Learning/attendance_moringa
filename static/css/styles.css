@@ -69,6 +69,16 @@ input[type='text']:focus, input[type='password']:focus, input[type='email']:focu
     border: 1px solid orange;
 }
 
+#edit_icon{
+    color: rgb(28, 28, 204);
+    padding: 0 5px;
+}
+
+#delete_icon{
+    color: rgb(184, 45, 45);
+    padding: 0 5px;
+}
+
 footer{
     text-align: center;
 }

@@ -8,12 +8,14 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import datetime
-import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://maingi:goQIqtZ0ApVyYGoZFEh0VEV2vUeAsuRc@dpg-cosk1u20si5c73avk83g-a.oregon-postgres.render.com/home_db_rz3y'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -33,11 +35,11 @@ class Student(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 # Extras
-def fetch_emails_from_db():
+def fetch_emails_from_db(user_id):
     try:
         conn = psycopg2.connect(app.config.get('SQLALCHEMY_DATABASE_URI'))
         cursor = conn.cursor()
-        cursor.execute("SELECT email FROM student")
+        cursor.execute(f"SELECT email FROM student WHERE user_id = {user_id}")
         emails = [row[0] for row in cursor.fetchall()]
         cursor.close()
         conn.close()
@@ -151,8 +153,11 @@ def add_students():
 @app.route('/list_students')
 @login_required
 def list_students():
-    students = Student.query.all()
-    return render_template('list_students.html', students=students, noOfstudents=len(students))
+    if current_user.is_authenticated:
+        students = Student.query.filter_by(user_id=current_user.id).all()
+        return render_template('list_students.html', students=students, noOfstudents=len(students))
+    else:
+        return "Unauthorized", 401
 
 @app.route('/check_attendance', methods=['GET', 'POST'])
 @login_required
@@ -160,7 +165,7 @@ def check_attendance():
     not_attended = None
     if request.method == 'POST':
         attending_list = request.form['attending_list'].split()
-        main_list = [student.email for student in Student.query.all()]
+        main_list = [student.email for student in Student.query.filter_by(user_id=current_user.id).all()]
         not_attended = [email for email in main_list if email not in attending_list]
     return render_template('check_attendance.html', not_attended=not_attended)
 
@@ -176,13 +181,13 @@ def edit_student(student_id):
         return redirect(url_for('list_students'))
     return render_template('edit_student.html', student=student)
 
-@app.route('/delete_student/<int:student_id>', methods=['POST'])
+@app.route('/delete_student/<int:student_id>', methods=['GET', 'DELETE'])
 @login_required
 def delete_student(student_id):
     student = Student.query.get_or_404(student_id)
     db.session.delete(student)
     db.session.commit()
-    flash('Student deleted successfully', 'success')
+    flash(f'{student.email} deleted successfully', 'info')
     return redirect(url_for('list_students'))
 
 @app.route('/attendance_preview', methods=['GET', 'POST'])
@@ -190,7 +195,7 @@ def delete_student(student_id):
 def attendance_preview():
     if request.method == 'POST':
         num_days = int(request.form['num_days'])
-        emails = fetch_emails_from_db()
+        emails = fetch_emails_from_db(current_user.id)
         return render_template('attendance_preview.html', num_days=num_days, emails=emails)
     return render_template('generate_pdf.html')
 
@@ -215,7 +220,7 @@ def manage_files():
 def view_file(filename):
     return send_file(os.path.join('attendance', filename))
 
-@app.route('/delete_file/<filename>', methods=['POST'])
+@app.route('/delete_file/<filename>', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def delete_file(filename):
     file_path = os.path.join('attendance', filename)
