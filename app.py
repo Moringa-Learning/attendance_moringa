@@ -9,6 +9,7 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import datetime
 from dotenv import load_dotenv
+from sqlalchemy.sql import text
 
 load_dotenv()
 
@@ -44,7 +45,8 @@ class Student(db.Model):
 def fetch_emails_from_db(user_id):
     try:
         with db.engine.connect() as connection:
-            result = connection.execute(f"SELECT email FROM student WHERE user_id = {user_id}")
+            query = text("SELECT email FROM student WHERE user_id = :user_id")
+            result = connection.execute(query, user_id=user_id)
             emails = [row[0] for row in result.fetchall()]
         return emails
     except Exception as error:
@@ -52,7 +54,7 @@ def fetch_emails_from_db(user_id):
         return []
     
 def create_pdf_template(output_filename, num_days, emails):
-    if num_days < 1 or num_days > 6:
+    if (num_days < 1 or num_days > 6):
         raise ValueError("Number of days must be between 1 and 6")
 
     pdf = SimpleDocTemplate(output_filename, pagesize=A4)
@@ -99,7 +101,7 @@ def create_pdf_template(output_filename, num_days, emails):
 # Routes
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 @app.route('/')
 @login_required
@@ -206,7 +208,7 @@ def attendance_preview():
 @login_required
 def generate_pdf():
     num_days = int(request.form['num_days'])
-    emails = fetch_emails_from_db()
+    emails = fetch_emails_from_db(current_user.id)
     output_filename = f'attendance/attendance_template-{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.pdf'
     create_pdf_template(output_filename, num_days, emails)
     return send_file(output_filename, as_attachment=True)
@@ -237,4 +239,4 @@ def delete_file(filename):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port='5000')
+    app.run(host='0.0.0.0', port=5000, debug=True)

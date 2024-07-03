@@ -1,19 +1,15 @@
 version: '3.8'
 
 services:
-  flask_app:
+  moringa_attendance:
     build: .
-    container_name: flask_app
+    container_name: moringa_attendance
     ports:
       - "5000:5000"
-    environment:
-
-      SECRET_KEY: "your_secret_key"
-      SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://username:password@db_host:db_port/db_name"
-      
+    env_file:
+      - .env
     volumes:
       - .:/app
-
     networks:
       app-network:
         ipv4_address: 10.1.0.5
