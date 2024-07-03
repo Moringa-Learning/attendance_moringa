@@ -15,7 +15,13 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+db_uri = 'postgresql+psycopg2://maingi:Spiderman1337@15.206.74.36:5432/attendance'
+
+if 'sqlite' in db_uri:
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri.replace('postgresql://', 'postgresql+psycopg2://')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -37,14 +43,11 @@ class Student(db.Model):
 # Extras
 def fetch_emails_from_db(user_id):
     try:
-        conn = psycopg2.connect(app.config.get('SQLALCHEMY_DATABASE_URI'))
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT email FROM student WHERE user_id = {user_id}")
-        emails = [row[0] for row in cursor.fetchall()]
-        cursor.close()
-        conn.close()
+        with db.engine.connect() as connection:
+            result = connection.execute(f"SELECT email FROM student WHERE user_id = {user_id}")
+            emails = [row[0] for row in result.fetchall()]
         return emails
-    except (Exception, psycopg2.DatabaseError) as error:
+    except Exception as error:
         print(error)
         return []
     
@@ -234,4 +237,4 @@ def delete_file(filename):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(debug=True, port='5000')
