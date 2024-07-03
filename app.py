@@ -15,7 +15,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-db_uri = 'postgresql+psycopg2://maingi:Spiderman1337@15.206.74.36:5432/attendance'
+db_uri = os.getenv('SQLALCHEMY_DATABASE_URI')
 
 if 'sqlite' in db_uri:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
