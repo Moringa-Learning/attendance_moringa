@@ -113,6 +113,12 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['pin']
+        
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Username already exists. Please log in.', 'warning')
+            return redirect(url_for('login'))
+        
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         new_user = User(username=username, password=hashed_password)
         db.session.add(new_user)
