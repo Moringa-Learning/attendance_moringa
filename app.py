@@ -45,8 +45,8 @@ class Student(db.Model):
 def fetch_emails_from_db(user_id):
     try:
         with db.engine.connect() as connection:
-            query = text("SELECT email FROM student WHERE user_id = :user_id")
-            result = connection.execute(query, user_id=user_id)
+            query = text(f"SELECT email FROM student WHERE user_id={user_id}")
+            result = connection.execute(query)
             emails = [row[0] for row in result.fetchall()]
         return emails
     except Exception as error:
