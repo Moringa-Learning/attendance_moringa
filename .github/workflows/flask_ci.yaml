@@ -53,9 +53,9 @@ jobs:
       postgres:
         image: postgres:13
         env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSOWRD }}
         ports:
           - 5432:5432
         options: >-
@@ -81,8 +81,8 @@ jobs:
       - name: Set up PostgreSQL
         run: |
           sudo apt-get install -y libpq-dev
-          export DATABASE_URL="postgresql+psycopg2://postgres:postgres@localhost:5432/test_db"
-          export SECRET_KEY="your_secret_key"
+          export DATABASE_URL=${{ secrets.SQLALCHEMY_DATABASE_URI }}
+          export SECRET_KEY=${{ secrets.SECRET_KEY }}
 
       - name: Run tests
         run: |
