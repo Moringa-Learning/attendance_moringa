@@ -79,7 +79,7 @@ def create_pdf_template(output_filename, num_days, emails):
         ('ALIGN', (0, 2), (0, -1), 'LEFT'),
     ])
     col_start = 1
-    for i in range(num_days):
+    for _ in range(num_days):
         col_end = col_start + 1
         style.add('SPAN', (col_start, 0), (col_end, 0))
         col_start += 2
