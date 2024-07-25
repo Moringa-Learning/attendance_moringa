@@ -50,7 +50,6 @@ Create a .env file in the root directory of your project and add the following v
 
 SECRET_KEY=your_secret_key
 SQLALCHEMY_DATABASE_URI=your_database_uri
-SQLALCHEMY_DATABASE_URI_TEST=your_database_uri
 ```
 Replace `your_secret_key` with a secret key for your application and `your_database_uri` with the database URI for your PostgreSQL or SQLite database.
 For local Testing you could either setup a SQLite database and use. Example of a database uri's
@@ -77,7 +76,7 @@ docker-compose up --build -d
 Open your web browser and navigate to http://localhost:5000.
 
 ## To Run Tests
-1. Ensure `SQLALCHEMY_DATABASE_URI_TEST` is configured
+1. Ensure `SQLALCHEMY_DATABASE_URI` is configured
 2. Open your Terminal and Ensure you are at the root folder then run
 ```bash
 python -m unittest discover -s tests
