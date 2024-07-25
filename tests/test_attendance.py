@@ -7,11 +7,13 @@ from dotenv import load_dotenv
 bcrypt = Bcrypt(app)
 load_dotenv()
 
+
 class FlaskTestCase(unittest.TestCase):
 
     def setUp(self):
         app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI_TEST')
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+            'SQLALCHEMY_DATABASE_URI_TEST')
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         self.app = app.test_client()
         with app.app_context():
@@ -24,7 +26,8 @@ class FlaskTestCase(unittest.TestCase):
 
     def create_user(self, username='testuser', password='testpassword'):
         with app.app_context():
-            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+            hashed_password = bcrypt.generate_password_hash(
+                password).decode('utf-8')
             user = User(username=username, password=hashed_password)
             db.session.add(user)
             db.session.commit()
@@ -32,7 +35,7 @@ class FlaskTestCase(unittest.TestCase):
 
     def test_home_page_requires_login(self):
         response = self.app.get('/')
-        self.assertEqual(response.status_code, 302) 
+        self.assertEqual(response.status_code, 302)
 
     def test_user_registration(self):
         response = self.app.post('/register', data={
@@ -76,6 +79,7 @@ class FlaskTestCase(unittest.TestCase):
         create_pdf_template(output_filename, num_days, emails)
         self.assertTrue(os.path.exists(output_filename))
         os.remove(output_filename)
+
 
 if __name__ == '__main__':
     unittest.main()
