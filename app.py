@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 import os
-import psycopg2
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
@@ -136,8 +135,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('index'))
-        else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
+        flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html')
 
 @app.route('/logout')
@@ -167,8 +165,7 @@ def list_students():
     if current_user.is_authenticated:
         students = Student.query.filter_by(user_id=current_user.id).all()
         return render_template('list_students.html', students=students, noOfstudents=len(students))
-    else:
-        return "Unauthorized", 401
+    return "Unauthorized", 401
 
 @app.route('/check_attendance', methods=['GET', 'POST'])
 @login_required
