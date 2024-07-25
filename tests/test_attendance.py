@@ -35,33 +35,33 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302) 
 
     def test_user_registration(self):
-        response = self.app.post('/register', data=dict(
-            username='newuser',
-            pin='password'
-        ), follow_redirects=True)
+        response = self.app.post('/register', data={
+            'username': 'newuser',
+            'pin': 'password'
+        }, follow_redirects=True)
         self.assertIn(b'Your account has been created!', response.data)
 
     def test_user_login(self):
         self.create_user()
-        response = self.app.post('/login', data=dict(
-            username='testuser',
-            password='testpassword'
-        ), follow_redirects=True)
+        response = self.app.post('/login', data={
+            'username': 'testuser',
+            'password': 'testpassword'
+        }, follow_redirects=True)
         self.assertIn(b'Logout', response.data)
 
     def test_add_students(self):
         with app.app_context():
             user = self.create_user()
 
-            response = self.app.post('/login', data=dict(
-                username='testuser',
-                password='testpassword'
-            ), follow_redirects=True)
+            response = self.app.post('/login', data={
+                'username': 'testuser',
+                'password': 'testpassword'
+            }, follow_redirects=True)
 
             with db.session.no_autoflush:
-                response = self.app.post('/add_students', data=dict(
-                    emails='student1@example.com student2@example.com'
-                ), follow_redirects=True)
+                response = self.app.post('/add_students', data={
+                    'emails': 'student1@example.com student2@example.com'
+                }, follow_redirects=True)
                 self.assertEqual(response.status_code, 200)
 
                 user = User.query.filter_by(username='testuser').first()
