@@ -19,6 +19,8 @@ Attendance Taker is a web app designed to streamline the process of marking atte
 - Docker Compose
 - ReportLab
 
+Incase you don't want to install postgresql, Could use the following [PostgreSQL Docker configuration](https://github.com/layersony/docker_postgres_dbs) 
+
 ## Getting Started
 #### Prerequisites
 - Docker
