@@ -39,9 +39,12 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git checkout dev
+          git merge origin/dev
           git add .
           git diff-index --quiet HEAD || git commit -m "Auto-format code with autopep8"
-          git push origin HEAD:dev
+          git push origin dev
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
