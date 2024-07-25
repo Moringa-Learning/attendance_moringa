@@ -9,6 +9,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import datetime
 from dotenv import load_dotenv
 from sqlalchemy.sql import text
+from sqlalchemy import exc
 
 load_dotenv()
 
@@ -48,34 +49,27 @@ def fetch_emails_from_db(user_id):
             result = connection.execute(query)
             emails = [row[0] for row in result.fetchall()]
         return emails
-    except Exception as error:
+    except exc.SQLAlchemyError as error:
         print(error)
         return []
     
 def create_pdf_template(output_filename, num_days, emails):
-    if (num_days < 1 or num_days > 6):
+    if not 1 <= num_days <= 6:
         raise ValueError("Number of days must be between 1 and 6")
 
+    def build_headers(num_days):
+        top_header = ['Email']
+        second_header = ['']
+        for i in range(num_days):
+            top_header.extend([f'Day {i + 1}', ''])
+            second_header.extend(['Time In', 'Sign'])
+        return [top_header, second_header]
+
+    headers = build_headers(num_days)
+    data = headers + [[email] + [''] * (len(headers[0]) - 1) for email in emails]
+
     pdf = SimpleDocTemplate(output_filename, pagesize=A4)
-    elements = []
-
-    top_header = ['Email']
-    for i in range(num_days):
-        top_header.extend([f'Day {i + 1}', '']) 
-
-    second_header = ['']
-    for _ in range(num_days):
-        second_header.extend(['Time In', 'Sign'])
-
-    headers = [top_header, second_header]
-
-    data = headers
-    for email in emails:
-        row = [email] + ['' for _ in range(len(top_header) - 1)]
-        data.append(row)
-
     table = Table(data)
-
     style = TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -84,18 +78,14 @@ def create_pdf_template(output_filename, num_days, emails):
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ('ALIGN', (0, 2), (0, -1), 'LEFT'),
     ])
-    
     col_start = 1
     for i in range(num_days):
         col_end = col_start + 1
         style.add('SPAN', (col_start, 0), (col_end, 0))
         col_start += 2
-    
+
     table.setStyle(style)
-
-    elements.append(table)
-
-    pdf.build(elements)
+    pdf.build([table])
 
 # Routes
 @login_manager.user_loader
