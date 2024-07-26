@@ -19,6 +19,8 @@ Attendance Taker is a web app designed to streamline the process of marking atte
 - Docker Compose
 - ReportLab
 
+Incase you don't want to install postgresql, Could use the following [PostgreSQL Docker configuration](https://github.com/layersony/docker_postgres_dbs) 
+
 ## Getting Started
 #### Prerequisites
 - Docker
@@ -72,6 +74,13 @@ docker-compose up --build -d
 4. Access the application
 
 Open your web browser and navigate to http://localhost:5000.
+
+## To Run Tests
+1. Ensure `SQLALCHEMY_DATABASE_URI` is configured
+2. Open your Terminal and Ensure you are at the root folder then run
+```bash
+python -m unittest discover -s tests
+```
 
 ## Usage
 ### User Registration
