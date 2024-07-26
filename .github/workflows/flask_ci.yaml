@@ -83,11 +83,11 @@ jobs:
       - name: Set up PostgreSQL
         run: |
           sudo apt-get install -y libpq-dev
-          export DATABASE_URL="postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}"
+          export SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}"
           export SECRET_KEY=${{ secrets.SECRET_KEY }}
 
       - name: Run tests
         run: |
-          export DATABASE_URL="postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}"
+          export SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}"
           export SECRET_KEY=${{ secrets.SECRET_KEY }}
           python -m unittest discover -s tests
