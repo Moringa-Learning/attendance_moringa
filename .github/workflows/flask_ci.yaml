@@ -88,4 +88,6 @@ jobs:
 
       - name: Run tests
         run: |
+          export SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}"
+          export SECRET_KEY=${{ secrets.SECRET_KEY }}
           python -m unittest discover -s tests
