@@ -61,7 +61,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U ${{ secrets.POSTGRES_USER }}" 
+          --health-cmd "pg_isready -U User" 
           --health-interval 10s 
           --health-timeout 5s 
           --health-retries 5
@@ -83,11 +83,9 @@ jobs:
       - name: Set up PostgreSQL
         run: |
           sudo apt-get install -y libpq-dev
-          export DATABASE_URL="postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}"
-          export SECRET_KEY="${{ secrets.SECRET_KEY }}"
+          export DATABASE_URL=postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}
+          export SECRET_KEY=${{ secrets.SECRET_KEY }}
 
       - name: Run tests
         run: |
           python -m unittest discover -s tests
-          export DATABASE_URL="postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}"
-          export SECRET_KEY="${{ secrets.SECRET_KEY }}"
