@@ -83,7 +83,7 @@ jobs:
       - name: Set up PostgreSQL
         run: |
           sudo apt-get install -y libpq-dev
-          export DATABASE_URL=postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}
+          export DATABASE_URL="postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}"
           export SECRET_KEY=${{ secrets.SECRET_KEY }}
 
       - name: Run tests
